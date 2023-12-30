@@ -1,4 +1,6 @@
 import random
+import sys
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,37 +15,43 @@ last_week, two_weeks_ago = get_num.get_last_two_weeks_numbers(cur_num)
 # 로또 번호 생성 함수
 def lotto_generator():
     lotto_numbers = []
-    last =0
-    two_ago = 0
+    # 지난 회차 번호와 겹치는 개수
+    last_duplicated = 0
+    # 지지난 회차 번호와 겹치는 개수
+    two_ago_duplicated = 0
+
+    # 생성가능한 숫자들
+    capable_numbers = list(range(1, 46))
     while len(lotto_numbers) < 6:
-        # 로또 번호 추출
-        number = random.randint(1, 45)
-        last, two_ago = control_num.has_same(number, last_week, two_weeks_ago, last, two_ago)
-        # 조건 1: 지난 주와 지지난 주의 당첨번호와 3개 이상 겹치지 않게
-        if last <3 and two_ago <3:
-            # 조건 2: 3개 연달아서 안 나오게
-            if (
-                    len(lotto_numbers) < 3 or
-                    control_num.has_consecutive_numbers(lotto_numbers) is False
-            ):
-                # 조건 3: 같은 번호대에서 3개까지만 나오게
-                if len(lotto_numbers) < 3 or control_num.has_same_three_tens(lotto_numbers) is False:
+        # 생성가능한 숫자들에서 로또 번호 추출
+        number = random.choice(capable_numbers)
+        last_duplicated, two_ago_duplicated = control_num.has_same_with_last_week(number, last_week, two_weeks_ago, last_duplicated, two_ago_duplicated)
+        # 조건 1: 지난 주와 지지난 주 회차와 같은 숫자가 3개 이상 존재하지 않는다.
+        if last_duplicated < 3 and two_ago_duplicated < 3:
+            # 조건 2: 3개 이상의 숫자가 연속되어 나오지 않는다.
+            if control_num.has_consecutive_numbers_more_than_three(lotto_numbers) is False:
+                # 조건 3: 추첨 숫자 중 같은 10의 자리 숫자가 3개 이상 존재하지 않는다.
+                if control_num.has_same_three_tens(lotto_numbers) is False:
                     # 추출 번호를 리스트에 추가
                     lotto_numbers.append(number)
+                    capable_numbers.remove(number)
+                # 지난 주와 지지난 주의 당첨번호와 3개 이상 겹치지 않고 3개 이상의 숫자가 연속되지 않지만 같은 10번대의 숫자가 3개인 경우
                 else:
-                    print("다시하는 중1")
                     continue
+            # 지난 주와 지지난 주의 당첨번호와 3개 이상 겹치지 않지만 3개 이상의 숫자가 연속된 경우
             else:
-                print("다시하는 중2")
                 continue
+        # 지난 주와 지지난 주의 당첨번호와 3개 이상 겹치는 경우
         else:
-            if last == 3:
-                last -=1
-            if two_ago == 3:
-                two_ago -=1
-            print("다시하는 중3", last, two_ago, "num: ",number)
+            # 지난 주 번호와 겹친 경우
+            if last_duplicated == 3:
+                last_duplicated -= 1
+                capable_numbers.remove(number)
+            # 지지난 주 번호와 겹친 경우
+            if two_ago_duplicated == 3:
+                two_ago_duplicated -= 1
+                capable_numbers.remove(number)
             continue
-
     return lotto_numbers
 
 
