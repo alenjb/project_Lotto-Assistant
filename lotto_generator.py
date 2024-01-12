@@ -14,10 +14,10 @@ last_week, two_weeks_ago = get_num.get_last_two_weeks_numbers(cur_num)
 
 
 # 로또 번호 생성 함수
-def lotto_generator(sets_unmber):
+def lotto_generator(sets_number):
     result_lists = []
     # 구매 세트 수만큼 반복
-    for _ in range(sets_unmber):
+    for _ in range(sets_number):
         lotto_numbers = []
         # 지난 회차 번호와 겹치는 개수
         last_duplicated = 0
@@ -62,9 +62,9 @@ def lotto_generator(sets_unmber):
 
 # 로또 번호 생성 및 출력
 # 구매할 세트 수를 입력받기
-sets_number = int(input("구매할 세트 수를 입력하세요: "))
-buy_amount = 1000 * sets_number
-expected_nums = sorted(lotto_generator(sets_number))
+received_sets_number= int(input("구매할 세트 수를 입력하세요: "))
+buy_amount = 1000 * received_sets_number
+expected_nums = sorted(lotto_generator(received_sets_number))
 print("번호 추출이 완료되었습니다.")
 login.login_and_buy(expected_nums)
 # 결과를 출력
